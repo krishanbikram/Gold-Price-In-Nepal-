@@ -1,101 +1,141 @@
-import Image from "next/image";
+import { Metadata } from 'next'
+import { prisma } from '@/lib/prisma'
+import { HeroGoldCard } from '@/components/home/HeroGoldCard'
+import { SilverCard } from '@/components/home/SilverCard'
+import { PriceGraph } from '@/components/home/PriceGraph'
+import { ComparisonTable } from '@/components/home/ComparisonTable'
+import { TrendCards } from '@/components/home/TrendCards'
+import { FAQSection, FAQSchema } from '@/components/home/FAQSection'
+import { LatestBlogs } from '@/components/home/LatestBlogs'
+import { WhatsAppShare } from '@/components/home/WhatsAppShare'
+import { formatNumber } from '@/lib/utils'
 
-export default function Home() {
+export const revalidate = 3600 // ISR: revalidate every hour
+
+async function getPriceData() {
+  const goldPrices = await prisma.goldPrice.findMany({
+    orderBy: { date: 'desc' },
+    take: 2,
+  })
+
+  const silverPrices = await prisma.silverPrice.findMany({
+    orderBy: { date: 'desc' },
+    take: 2,
+  })
+
+  const todayGold = goldPrices[0]
+  const yesterdayGold = goldPrices[1]
+  const todaySilver = silverPrices[0]
+  const yesterdaySilver = silverPrices[1]
+
+  const goldChange = yesterdayGold
+    ? Number(todayGold?.price_per_tola) - Number(yesterdayGold.price_per_tola)
+    : 0
+  const silverChange = yesterdaySilver
+    ? Number(todaySilver?.silver_per_tola) - Number(yesterdaySilver.silver_per_tola)
+    : 0
+
+  return {
+    gold: todayGold
+      ? {
+          price_tola: Number(todayGold.price_per_tola),
+          
+          price_10g: Number(todayGold.price_per_10g),
+          
+          price_ounce: Number(todayGold.price_per_ounce),
+          date: todayGold.date.toISOString(),
+          nepali_date: todayGold.nepali_date,
+          change_amount: Math.round(goldChange),
+          change_percent: yesterdayGold
+            ? Number(((goldChange / Number(yesterdayGold.price_per_tola)) * 100).toFixed(2))
+            : 0,
+        }
+      : null,
+    silver: todaySilver
+      ? {
+          tola: Number(todaySilver.silver_per_tola),
+          date: todaySilver.date.toISOString(),
+          nepali_date: todaySilver.nepali_date,
+          gram10: Number(todaySilver.silver_per_10g),
+          ounce: Number(todaySilver.silver_per_ounce),
+          change_amount: Math.round(silverChange),
+          change_percent: yesterdaySilver
+            ? Number(((silverChange / Number(yesterdaySilver.silver_per_tola)) * 100).toFixed(2))
+            : 0,
+        }
+      : null,
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { gold } = await getPriceData()
+  const today = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return {
+    title: `Gold Price in Nepal Today ${today} | Suna Ko Bhaau | 24 Carat Gold Rate`,
+    description: `Today's Gold Price in Nepal: 24 Carat Gold NPR ${
+      gold ? formatNumber(gold.price_tola) : ''
+    }/tola. Hallmark gold & silver rates updated daily by FENEGOSIDA. Suna Ko Bhaau in Nepali - goldpricenp.com`,
+    alternates: {
+      canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com',
+    },
+  }
+}
+
+export default async function HomePage() {
+  const { gold, silver } = await getPriceData()
+
+  if (!gold || !silver) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-3xl font-bold text-white mb-4">Gold Price Nepal</h1>
+        <p className="text-slate-400">Price data is being loaded. Please check back shortly.</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      <FAQSchema price={gold.price_tola} silverPrice={silver.tola} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      {/* Hero Gold Price */}
+      <HeroGoldCard gold={gold} />
+
+      {/* WhatsApp Share */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center -mt-2 mb-4">
+        <WhatsAppShare
+          price={gold.price_tola}
+          date={gold.date}
+        />
+      </div>
+
+      {/* Silver Price */}
+      <SilverCard silver={silver} />
+
+      {/* Interactive Price Graph */}
+      <PriceGraph />
+
+      {/* Comparison Table */}
+      <ComparisonTable
+        data={{
+          price_tola: gold.price_tola,
+          
+          silverTola: silver.tola,
+        }}
+      />
+
+      {/* Trend Cards */}
+      <TrendCards />
+
+      {/* FAQ Section */}
+      <FAQSection price={gold.price_tola} silverPrice={silver.tola} />
+
+      {/* Latest Blog Posts */}
+      <LatestBlogs />
+    </>
+  )
 }

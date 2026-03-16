@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model GoldPrice {
+  id              String   @id @default(uuid()) @db.Uuid
+  date            DateTime @unique @db.Date
+  price_per_tola  Decimal  @db.Decimal(10, 2)
+  price_per_10g   Decimal  @db.Decimal(10, 2)
+  price_per_ounce Decimal  @db.Decimal(10, 2)
+  nepali_date     String?  @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz()
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamptz()
+
+  @@index([date(sort: Desc)])
+  @@map("gold_prices")
+}
+
+model SilverPrice {
+  id               String   @id @default(uuid()) @db.Uuid
+  date             DateTime @unique @db.Date
+  silver_per_tola  Decimal  @db.Decimal(10, 2)
+  silver_per_10g   Decimal  @db.Decimal(10, 2)
+  silver_per_ounce Decimal  @db.Decimal(10, 2)
+  nepali_date      String?  @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz()
+
+  @@index([date(sort: Desc)])
+  @@map("silver_prices")
+}
+
+model BlogPost {
+  id                 String    @id @default(uuid()) @db.Uuid
+  title              String    @db.VarChar(255)
+  slug               String    @unique @db.VarChar(255)
+  content            String?   @db.Text
+  meta_title         String?   @db.VarChar(60)
+  meta_description   String?   @db.VarChar(160)
+  focus_keyword      String?   @db.VarChar(100)
+  category           String?   @db.VarChar(100)
+  tags               String[]
+  featured_image_url String?   @db.Text
+  is_published       Boolean   @default(false)
+  published_at       DateTime? @db.Timestamptz()
+  created_at         DateTime  @default(now()) @db.Timestamptz()
+  updated_at         DateTime  @default(now()) @updatedAt @db.Timestamptz()
+
+  @@index([slug])
+  @@index([is_published, published_at(sort: Desc)])
+  @@index([category])
+  @@map("blog_posts")
+}
+
+model AdminUser {
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @unique @db.VarChar(255)
+  password_hash String   @db.Text
+  name          String?  @db.VarChar(100)
+  created_at    DateTime @default(now()) @db.Timestamptz()
+
+  @@map("admin_users")
+}
