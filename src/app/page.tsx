@@ -9,6 +9,7 @@ import { FAQSection, FAQSchema } from '@/components/home/FAQSection'
 import { LatestBlogs } from '@/components/home/LatestBlogs'
 import { WhatsAppShare } from '@/components/home/WhatsAppShare'
 import { formatNumber, getNepaliDate } from '@/lib/utils'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 3600 // ISR: revalidate every hour
 
@@ -80,9 +81,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: `Gold Price in Nepal Today: 24 Carat Gold NPR ${
       gold ? formatNumber(gold.price_tola) : ''
     }/tola. Hallmark gold & silver rates updated daily by FENEGOSIDA. Suna Ko Bhaau in Nepali - goldpricenp.com`,
-    alternates: {
-      canonical: '/',
-    },
   }
 }
 
@@ -100,6 +98,12 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Canonical is rendered here (not via metadata) because
+          Next.js normalises the root metadata canonical to the
+          bare origin without the trailing slash, which strict
+          SEO tools flag as 'canonicalised'. This emits exactly
+          one canonical: https://www.goldpricenp.com/ */}
+      <link rel="canonical" href={`${SITE_URL}/`} />
       <FAQSchema price={gold.price_tola} silverPrice={silver.tola} />
 
       {/* Hero Gold Price */}
