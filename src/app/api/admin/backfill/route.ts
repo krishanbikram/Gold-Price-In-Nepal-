@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { revalidatePath } from 'next/cache'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
 import { getNepaliDate } from '@/lib/utils'
-import backfillData from '@/data/backfill-prices.json'
+import backfillRows from '@/data/backfill-prices.json'
 
-// One-time backfill import: FENEGOSIDA daily rates 2026-04-02 .. 2026-10-25
-// (173 trading days missing from the DB). Session-protected and idempotent
-// (upsert by date) — safe to call more than once. Remove this route and
-// src/data/backfill-prices.json after the import has been verified.
-
-const TOLA_TO_GRAM = 11.6638
-const OUNCE_TO_GRAM = 31.1035
+// One-time bulk import of the missing FENEGOSIDA daily rates
+// (2026-04-02 .. 2026-10-25). Admin-session protected and
+// idempotent: createMany + skipDuplicates inserts only the
+// dates that are still missing, so re-running it after the
+// first (partially completed) run safely fills the gap.
+// Remove this route and src/data/backfill-prices.json once
+// the import has been verified.
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 interface BackfillRow {
   date: string
@@ -20,80 +22,68 @@ interface BackfillRow {
   silver: number
 }
 
+const TOLA_GRAMS = 11.6638
+const OUNCE_GRAMS = 31.1035
+
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const rows = backfillData as BackfillRow[]
-    let imported = 0
-
-    for (const row of rows) {
-      const date = new Date(`${row.date}T00:00:00.000Z`)
-      const nepali_date = getNepaliDate(date)
-
-      const gold = Number(row.gold)
-      const silver = Number(row.silver)
-
-      await prisma.goldPrice.upsert({
-        where: { date },
-        update: {
-          price_per_tola: gold,
-          price_per_10g: Number(((gold * 10) / TOLA_TO_GRAM).toFixed(2)),
-          price_per_ounce: Number(((gold * OUNCE_TO_GRAM) / TOLA_TO_GRAM).toFixed(2)),
-          nepali_date,
-          updated_at: new Date(),
-        },
-        create: {
-          date,
-          price_per_tola: gold,
-          price_per_10g: Number(((gold * 10) / TOLA_TO_GRAM).toFixed(2)),
-          price_per_ounce: Number(((gold * OUNCE_TO_GRAM) / TOLA_TO_GRAM).toFixed(2)),
-          nepali_date,
-        },
-      })
-
-      await prisma.silverPrice.upsert({
-        where: { date },
-        update: {
-          silver_per_tola: silver,
-          silver_per_10g: Number(((silver * 10) / TOLA_TO_GRAM).toFixed(2)),
-          silver_per_ounce: Number(((silver * OUNCE_TO_GRAM) / TOLA_TO_GRAM).toFixed(2)),
-          nepali_date,
-          updated_at: new Date(),
-        },
-        create: {
-          date,
-          silver_per_tola: silver,
-          silver_per_10g: Number(((silver * 10) / TOLA_TO_GRAM).toFixed(2)),
-          silver_per_ounce: Number(((silver * OUNCE_TO_GRAM) / TOLA_TO_GRAM).toFixed(2)),
-          nepali_date,
-        },
-      })
-
-      imported++
-    }
-
-    revalidatePath('/')
-    revalidatePath('/gold-price-history')
-    revalidatePath('/silver-price-nepal')
-    revalidatePath('/gold-price-today')
-
-    const latest = await prisma.goldPrice.findFirst({ orderBy: { date: 'desc' } })
-    const total = await prisma.goldPrice.count()
-
-    return NextResponse.json({
-      success: true,
-      imported,
-      total_gold_rows: total,
-      latest_date: latest?.date,
-      latest_gold_per_tola: latest ? Number(latest.price_per_tola) : null,
-      latest_nepali_date: latest?.nepali_date ?? null,
-    })
-  } catch (error) {
-    console.error('Backfill import error:', error)
-    return NextResponse.json({ error: 'Backfill import failed' }, { status: 500 })
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const rows = backfillRows as BackfillRow[]
+
+  const goldData = rows.map((row) => {
+    const perTola = row.gold
+    return {
+      date: new Date(`${row.date}T00:00:00.000Z`),
+      nepali_date: getNepaliDate(row.date),
+      price_per_tola: perTola,
+      price_per_10g: Math.round(((perTola * 10) / TOLA_GRAMS) * 100) / 100,
+      price_per_ounce:
+        Math.round(((perTola * OUNCE_GRAMS) / TOLA_GRAMS) * 100) / 100,
+    }
+  })
+
+  const silverData = rows.map((row) => {
+    const perTola = row.silver
+    return {
+      date: new Date(`${row.date}T00:00:00.000Z`),
+      nepali_date: getNepaliDate(row.date),
+      silver_per_tola: perTola,
+      silver_per_10g: Math.round(((perTola * 10) / TOLA_GRAMS) * 100) / 100,
+      silver_per_ounce:
+        Math.round(((perTola * OUNCE_GRAMS) / TOLA_GRAMS) * 100) / 100,
+    }
+  })
+
+  const goldResult = await prisma.goldPrice.createMany({
+    data: goldData,
+    skipDuplicates: true,
+  })
+  const silverResult = await prisma.silverPrice.createMany({
+    data: silverData,
+    skipDuplicates: true,
+  })
+
+  const totalGold = await prisma.goldPrice.count()
+  const latest = await prisma.goldPrice.findFirst({
+    orderBy: { date: 'desc' },
+  })
+
+  revalidatePath('/')
+  revalidatePath('/gold-price-history')
+  revalidatePath('/silver-price-nepal')
+  revalidatePath('/gold-price-today')
+
+  return NextResponse.json({
+    success: true,
+    gold_inserted: goldResult.count,
+    silver_inserted: silverResult.count,
+    dataset_rows: rows.length,
+    total_gold_rows: totalGold,
+    latest_date: latest?.date ?? null,
+    latest_gold_per_tola: latest ? Number(latest.price_per_tola) : null,
+    latest_nepali_date: latest?.nepali_date ?? null,
+  })
 }
