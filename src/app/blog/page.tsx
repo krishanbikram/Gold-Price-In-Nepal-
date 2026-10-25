@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Gold Price Blog Nepal | Suna, Chandi & Jewellery News | GoldPriceNP',
   description: 'Expert articles on Gold Price in Nepal, investment tips, purity guides, and jewellery insights. Stay updated on Suna Ko Bhaau and gold market trends.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com'}/blog`,
+    canonical: '/blog',
   },
 }
 
@@ -20,6 +20,7 @@ export default async function BlogPage() {
       meta_description: true,
       category: true,
       tags: true,
+      featured_image_url: true,
       published_at: true,
     },
   })
@@ -50,9 +51,19 @@ export default async function BlogPage() {
                 className="card-dark p-6 block group hover:border-gold-500/30 transition-all"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-gold-500/20 to-navy-800 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">📰</span>
-                  </div>
+                  {post.featured_image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={post.featured_image_url}
+                      alt={post.title}
+                      className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-gold-500/20 to-navy-800 flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">📰</span>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     {post.category && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gold-500/10 text-gold-400 mb-2">

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1530"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FCD34D"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1010" cy="150" r="120" fill="url(#gold)" opacity="0.9"/>
+  <circle cx="1010" cy="150" r="92" fill="none" stroke="#92400E" stroke-width="4" opacity="0.5"/>
+  <text x="1010" y="140" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#451A03" text-anchor="middle">24K</text>
+  <text x="1010" y="182" font-family="Georgia, serif" font-size="24" fill="#451A03" text-anchor="middle">999.9</text>
+  <circle cx="930" cy="330" r="74" fill="url(#gold)" opacity="0.65"/>
+  <circle cx="930" cy="330" r="55" fill="none" stroke="#92400E" stroke-width="3" opacity="0.45"/>
+  <text x="930" y="340" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#451A03" text-anchor="middle">Au</text>
+  <circle cx="1065" cy="455" r="52" fill="url(#gold)" opacity="0.45"/>
+  <text x="120" y="215" font-family="Verdana, sans-serif" font-size="40" font-weight="bold" fill="#F59E0B" letter-spacing="2">GoldPriceNP</text>
+  <text x="118" y="315" font-family="Verdana, sans-serif" font-size="72" font-weight="bold" fill="#FFFFFF">Gold Price in</text>
+  <text x="118" y="400" font-family="Verdana, sans-serif" font-size="72" font-weight="bold" fill="#FFFFFF">Nepal <tspan fill="#F59E0B">Today</tspan></text>
+  <text x="120" y="480" font-family="Verdana, sans-serif" font-size="30" fill="#94A3B8">Daily FENEGOSIDA rates — Suna Ko Bhaau, per tola</text>
+  <rect x="120" y="520" width="430" height="3" fill="#F59E0B" opacity="0.7"/>
+</svg>

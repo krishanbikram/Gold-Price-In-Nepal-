@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'About GoldPriceNP | Nepal Gold & Silver Price Tracker',
   description: 'Learn about GoldPriceNP.com — Nepal\'s most accurate gold and silver price tracker. Check Suna Ko Bhaau, data source (FENEGOSIDA), our mission, and what we offer.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com'}/about`,
+    canonical: '/about',
   },
 }
 

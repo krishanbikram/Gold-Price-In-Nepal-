@@ -1,7 +1,9 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { PriceGraph } from '@/components/home/PriceGraph'
 import { HistoryTable } from '@/components/history/HistoryTable'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 3600
 
@@ -10,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Complete archive of daily Gold Price in Nepal. View 24 Carat Gold rates with interactive charts, Nepali date (BS), date filters, and CSV download. Historical data from FENEGOSIDA.',
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com'}/gold-price-history`,
+    canonical: '/gold-price-history',
   },
 }
 
@@ -51,7 +53,7 @@ export default async function GoldPriceHistoryPage() {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
               { '@type': 'ListItem', position: 2, name: 'Gold Price History' },
             ],
           }),
@@ -64,7 +66,9 @@ export default async function GoldPriceHistoryPage() {
             Gold Price History in Nepal
           </h1>
           <p className="text-slate-400">
-            Daily archive of 24 Carat Gold rates set by FENEGOSIDA
+            Daily archive of 24 Carat Gold rates set by FENEGOSIDA — compare with the{' '}
+            <Link href="/" className="text-gold-400 hover:underline">gold price in nepal today</Link>{' '}
+            and the <Link href="/silver-price-nepal" className="text-gold-400 hover:underline">silver price in Nepal</Link>.
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 const quickLinks = [
   { href: '/', label: 'Home' },
-  { href: '/gold-price-history', label: "Today's Rate" },
+  { href: '/', label: "Today's Gold Price" },
   { href: '/gold-price-history', label: 'Price History' },
   { href: '/silver-price-nepal', label: 'Silver Price' },
   { href: '/gold-rate-calculator', label: 'Calculator' },
@@ -11,9 +11,9 @@ const quickLinks = [
 ]
 
 const resources = [
-  { href: '/blog/complete-guide-buying-gold-nepal', label: 'Buying Gold Guide' },
-  { href: '/blog/gold-purity-24-carat-nepal', label: 'Gold Purity Guide' },
-  { href: '/blog/gold-investment-nepal-2025-guide', label: 'Investment Guide' },
+  { href: '/blog/how-to-check-gold-purity-nepal', label: 'Gold Purity Guide' },
+  { href: '/blog/current-trends-nepal-gold-market', label: 'Gold Market Trends' },
+  { href: '/blog', label: 'All Gold Guides' },
 ]
 
 export function Footer() {

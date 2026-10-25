@@ -1,7 +1,9 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatNumber, getNepaliDate } from '@/lib/utils'
 import { PriceGraph } from '@/components/home/PriceGraph'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 3600
 
@@ -15,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
       silver ? formatNumber(Number(silver.silver_per_tola)) : ''
     }/tola. Check daily silver rates per 10g, ounce, and tola. Historical price charts from FENEGOSIDA.`,
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com'}/silver-price-nepal`,
+      canonical: '/silver-price-nepal',
     },
   }
 }
@@ -46,7 +48,7 @@ export default async function SilverPricePage() {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
               { '@type': 'ListItem', position: 2, name: 'Silver Price Nepal' },
             ],
           }),
@@ -58,7 +60,10 @@ export default async function SilverPricePage() {
           <h1 className="text-3xl sm:text-4xl font-bold font-display text-white mb-2">
             Silver Price in Nepal Today
           </h1>
-          <p className="text-slate-400">चाँदीको मूल्य — Daily rates from FENEGOSIDA</p>
+          <p className="text-slate-400">
+            चाँदीको मूल्य — Daily rates from FENEGOSIDA · Also see the{' '}
+            <Link href="/" className="text-gold-400 hover:underline">gold price in nepal today</Link>
+          </p>
         </div>
 
         {/* Main Price Card */}

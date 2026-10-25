@@ -42,11 +42,20 @@ export async function LatestBlogs() {
             href={`/blog/${post.slug}`}
             className="card-dark group hover:border-gold-500/30 transition-all duration-200 overflow-hidden"
           >
-            {/* Image placeholder */}
-            <div className="h-44 bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 to-transparent" />
-              <span className="text-4xl">📰</span>
-            </div>
+            {post.featured_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={post.featured_image_url}
+                alt={post.title}
+                className="h-44 w-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="h-44 bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 to-transparent" />
+                <span className="text-4xl">📰</span>
+              </div>
+            )}
 
             <div className="p-5">
               {post.category && (

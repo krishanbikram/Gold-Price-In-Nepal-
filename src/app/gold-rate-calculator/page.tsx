@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { formatNumber } from '@/lib/utils'
+import { SITE_URL } from '@/lib/site'
 
 const TOLA_TO_GRAM = 11.6638
 const OUNCE_TO_GRAM = 31.1035
@@ -59,7 +60,7 @@ export default function GoldCalculatorPage() {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
               { '@type': 'ListItem', position: 2, name: 'Gold Calculator' },
             ],
           }),

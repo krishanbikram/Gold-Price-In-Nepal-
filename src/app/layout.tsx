@@ -3,10 +3,12 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Gold Price in Nepal Today 2025 | Suna Ko Bhaau | goldpricenp.com",
+    default: "Gold Price in Nepal Today | Suna Ko Bhaau | goldpricenp.com",
     template: "%s | GoldPriceNP",
   },
   description:
@@ -29,14 +31,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.goldpricenp.com",
+    url: SITE_URL,
     siteName: "GoldPriceNP",
     title: "Gold Price in Nepal Today | Suna Ko Bhaau | GoldPriceNP",
     description:
       "Nepal's most accurate gold price tracker. Check daily 24 Carat & Hallmark Gold rates per Tola, silver prices, historical charts, and gold calculator at goldpricenp.com.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Gold Price in Nepal Today - GoldPriceNP",
@@ -69,13 +71,13 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Gold Price Nepal",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.goldpricenp.com",
+  url: SITE_URL,
   description: "Nepal's most accurate gold and silver price tracker",
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.goldpricenp.com"}/blog?q={search_term_string}`,
+      urlTemplate: `${SITE_URL}/blog?q={search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },

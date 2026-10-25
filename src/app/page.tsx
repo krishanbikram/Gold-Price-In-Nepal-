@@ -77,11 +77,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: `Gold Price in Nepal Today ${gold?.nepali_date || getNepaliDate(gold?.date)} (${today}) | Suna Ko Bhaau | 24 Carat Gold Rate`,
-    description: `Today's Gold Price in Nepal: 24 Carat Gold NPR ${
+    description: `Gold Price in Nepal Today: 24 Carat Gold NPR ${
       gold ? formatNumber(gold.price_tola) : ''
     }/tola. Hallmark gold & silver rates updated daily by FENEGOSIDA. Suna Ko Bhaau in Nepali - goldpricenp.com`,
     alternates: {
-      canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com',
+      canonical: '/',
     },
   }
 }

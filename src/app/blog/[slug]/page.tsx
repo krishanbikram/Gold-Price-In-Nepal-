@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { SITE_URL } from '@/lib/site'
 
 interface Props {
   params: { slug: string }
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: post.meta_title || post.title,
     description: post.meta_description || '',
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/blog/${params.slug}`,
+      canonical: `/blog/${params.slug}`,
     },
   }
 }
@@ -90,8 +91,8 @@ export default async function BlogPostPage({ params }: Props) {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
-              { '@type': 'ListItem', position: 2, name: 'Blog', item: `${process.env.NEXT_PUBLIC_SITE_URL}/blog` },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+              { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
               { '@type': 'ListItem', position: 3, name: post.title },
             ],
           }),
@@ -132,6 +133,15 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           </header>
 
+          {post.featured_image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={post.featured_image_url}
+              alt={post.title}
+              className="w-full h-auto max-h-96 object-cover rounded-xl mb-8"
+            />
+          )}
+
           {/* TOC */}
           {headings.length > 0 && (
             <div className="card-dark p-5 mb-8">
@@ -170,7 +180,9 @@ export default async function BlogPostPage({ params }: Props) {
           {/* Internal Links (SEO) */}
           <div className="mt-8 p-4 bg-navy-950/60 rounded-xl border border-navy-700/50">
             <p className="text-sm text-slate-400">
-              📊 Check <Link href="/gold-price-history" className="text-gold-400 hover:underline">historical gold prices</Link> or
+              📊 See the <Link href="/" className="text-gold-400 hover:underline">gold price in nepal today</Link>, browse
+              the <Link href="/gold-price-history" className="text-gold-400 hover:underline">historical gold prices</Link>, check
+              the <Link href="/silver-price-nepal" className="text-gold-400 hover:underline">silver price in Nepal</Link> or
               use our <Link href="/gold-rate-calculator" className="text-gold-400 hover:underline">gold price calculator</Link> to
               estimate jewellery costs.
             </p>

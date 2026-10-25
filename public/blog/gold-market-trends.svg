@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1530"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- chart grid -->
+  <g stroke="#1E293B" stroke-width="2">
+    <line x1="90" y1="150" x2="1110" y2="150"/>
+    <line x1="90" y1="250" x2="1110" y2="250"/>
+    <line x1="90" y1="350" x2="1110" y2="350"/>
+    <line x1="90" y1="450" x2="1110" y2="450"/>
+  </g>
+  <!-- area + line -->
+  <path d="M90 430 L260 395 L430 415 L560 300 L700 330 L840 235 L980 260 L1110 175 L1110 470 L90 470 Z" fill="url(#area)"/>
+  <path d="M90 430 L260 395 L430 415 L560 300 L700 330 L840 235 L980 260 L1110 175" fill="none" stroke="#F59E0B" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <g fill="#FCD34D">
+    <circle cx="560" cy="300" r="9"/>
+    <circle cx="840" cy="235" r="9"/>
+    <circle cx="1110" cy="175" r="11"/>
+  </g>
+  <text x="90" y="95" font-family="Verdana, sans-serif" font-size="30" fill="#F59E0B" letter-spacing="2">MARKET ANALYSIS</text>
+  <text x="88" y="560" font-family="Verdana, sans-serif" font-size="56" font-weight="bold" fill="#FFFFFF">Nepal Gold Market <tspan fill="#F59E0B">Trends</tspan></text>
+  <text x="90" y="600" font-family="Verdana, sans-serif" font-size="24" fill="#94A3B8">Record highs, duty changes &amp; what moves the price — GoldPriceNP</text>
+</svg>
