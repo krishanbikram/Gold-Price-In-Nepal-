@@ -23,7 +23,7 @@ interface BlogUpdate {
   published_at: string
 }
 
-export async function POST(_request: NextRequest) {
+async function runUpdate() {
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -55,4 +55,14 @@ export async function POST(_request: NextRequest) {
   revalidatePath('/blog')
 
   return NextResponse.json({ success: true, updated: results })
+}
+
+export async function POST(_request: NextRequest) {
+  return runUpdate()
+}
+
+// GET is supported so the one-time update can be triggered by
+// simply opening the URL in the signed-in admin browser.
+export async function GET() {
+  return runUpdate()
 }
