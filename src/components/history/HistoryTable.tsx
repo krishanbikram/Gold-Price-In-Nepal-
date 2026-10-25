@@ -28,8 +28,9 @@ export function HistoryTable({ prices }: { prices: PriceRow[] }) {
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage)
 
   const downloadCSV = () => {
-    const headers = ['Date', '24 Carat Gold/Tola', '24 Carat Gold/10g', 'Daily Change']
+    const headers = ['Nepali Date (BS)', 'Date (AD)', '24 Carat Gold/Tola', '24 Carat Gold/10g', 'Daily Change']
     const rows = filtered.map((p) => [
+      p.nepali_date || getNepaliDate(p.date),
       new Date(p.date).toISOString().split('T')[0],
       p.price_per_tola,
       p.price_per_10g,
@@ -73,8 +74,8 @@ export function HistoryTable({ prices }: { prices: PriceRow[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-navy-950/60">
-              <th className="text-left px-4 py-3 text-slate-400 font-semibold rounded-l-lg">Date (AD)</th>
-              <th className="text-left px-4 py-3 text-slate-400 font-semibold">Nepali Date (BS)</th>
+              <th className="text-left px-4 py-3 text-slate-400 font-semibold rounded-l-lg">Nepali Date (BS)</th>
+              <th className="text-left px-4 py-3 text-slate-400 font-semibold">Date (AD)</th>
               <th className="text-right px-4 py-3 text-slate-400 font-semibold">24 Carat Gold/Tola</th>
               <th className="text-right px-4 py-3 text-slate-400 font-semibold">24 Carat Gold/10g</th>
               <th className="text-right px-4 py-3 text-slate-400 font-semibold rounded-r-lg">Change</th>
@@ -86,10 +87,10 @@ export function HistoryTable({ prices }: { prices: PriceRow[] }) {
               const isDown = p.change < 0
               return (
                 <tr key={p.date} className="hover:bg-navy-950/30 transition-colors">
-                  <td className="px-4 py-3 text-slate-300">{formatDateEN(p.date)}</td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">
+                  <td className="px-4 py-3 text-slate-200 font-medium">
                     {p.nepali_date || getNepaliDate(p.date)}
                   </td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{formatDateEN(p.date)}</td>
                   <td className="px-4 py-3 text-right text-white font-medium tabular-nums">
                     NPR {formatNumber(p.price_per_tola)}
                   </td>

@@ -8,7 +8,7 @@ import { TrendCards } from '@/components/home/TrendCards'
 import { FAQSection, FAQSchema } from '@/components/home/FAQSection'
 import { LatestBlogs } from '@/components/home/LatestBlogs'
 import { WhatsAppShare } from '@/components/home/WhatsAppShare'
-import { formatNumber } from '@/lib/utils'
+import { formatNumber, getNepaliDate } from '@/lib/utils'
 
 export const revalidate = 3600 // ISR: revalidate every hour
 
@@ -76,7 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 
   return {
-    title: `Gold Price in Nepal Today ${today} | Suna Ko Bhaau | 24 Carat Gold Rate`,
+    title: `Gold Price in Nepal Today ${gold?.nepali_date || getNepaliDate(gold?.date)} (${today}) | Suna Ko Bhaau | 24 Carat Gold Rate`,
     description: `Today's Gold Price in Nepal: 24 Carat Gold NPR ${
       gold ? formatNumber(gold.price_tola) : ''
     }/tola. Hallmark gold & silver rates updated daily by FENEGOSIDA. Suna Ko Bhaau in Nepali - goldpricenp.com`,

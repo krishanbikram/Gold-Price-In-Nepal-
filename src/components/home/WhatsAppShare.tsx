@@ -1,6 +1,6 @@
 'use client'
 
-import { formatNumber, formatDateEN } from '@/lib/utils'
+import { formatNumber, formatDateEN, getNepaliDate } from '@/lib/utils'
 
 interface WhatsAppShareProps {
   price: number
@@ -10,7 +10,7 @@ interface WhatsAppShareProps {
 export function WhatsAppShare({ price, date }: WhatsAppShareProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.goldpricenp.com'
   
-  const message = `Gold Price in Nepal Today (${formatDateEN(date)}):\n\n🥇 24 Carat Gold: NPR ${formatNumber(price)}/tola\n\nCheck live rates: ${siteUrl}`
+  const message = `Gold Price in Nepal Today (${getNepaliDate(date)} | ${formatDateEN(date)}):\n\n🥇 24 Carat Gold: NPR ${formatNumber(price)}/tola\n\nCheck live rates: ${siteUrl}`
   
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
 

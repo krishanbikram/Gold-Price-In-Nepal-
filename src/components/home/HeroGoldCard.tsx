@@ -36,10 +36,10 @@ export function HeroGoldCard({ gold }: { gold: GoldData }) {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-white mb-2">
             Gold Price <span className="gold-gradient-text">Today</span>
           </h1>
-          <div className="flex items-center justify-center gap-3 text-slate-400 text-sm">
-            <time className="font-medium">{formatDateEN(gold.date)}</time>
+          <div className="flex items-center justify-center gap-3">
+            <time className="font-semibold text-base sm:text-lg text-gold-400">{gold.nepali_date || getNepaliDate(gold.date)}</time>
             <span className="text-navy-700">|</span>
-            <span className="text-gold-400/80">{gold.nepali_date || getNepaliDate(gold.date)}</span>
+            <span className="text-slate-500 text-xs font-medium">{formatDateEN(gold.date)}</span>
           </div>
         </div>
 

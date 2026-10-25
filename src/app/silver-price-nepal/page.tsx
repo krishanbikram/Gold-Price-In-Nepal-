@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
-import { formatNumber } from '@/lib/utils'
+import { formatNumber, getNepaliDate } from '@/lib/utils'
 import { PriceGraph } from '@/components/home/PriceGraph'
 
 export const revalidate = 3600
@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return {
-    title: `Silver Price in Nepal Today ${today} | Chandi Ko Bhaau | GoldPriceNP`,
+    title: `Silver Price in Nepal Today ${silver?.nepali_date ? silver.nepali_date + ' ' : ''}(${today}) | Chandi Ko Bhaau | GoldPriceNP`,
     description: `Today's Silver Price in Nepal (Chandi Ko Bhaau): NPR ${
       silver ? formatNumber(Number(silver.silver_per_tola)) : ''
     }/tola. Check daily silver rates per 10g, ounce, and tola. Historical price charts from FENEGOSIDA.`,
@@ -83,6 +83,12 @@ export default async function SilverPricePage() {
                     {change >= 0 ? '▲' : '▼'} NPR {formatNumber(Math.abs(Math.round(change)))}
                   </span>
                 </div>
+                <p className="mt-4 text-base font-semibold text-slate-200">
+                  {today.nepali_date || getNepaliDate(today.date)}
+                  <span className="text-slate-500 text-xs font-medium ml-2">
+                    {today.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </p>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -121,7 +127,8 @@ export default async function SilverPricePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-navy-950/60">
-                  <th className="text-left px-4 py-3 text-slate-400 font-semibold rounded-l-lg">Date</th>
+                  <th className="text-left px-4 py-3 text-slate-400 font-semibold rounded-l-lg">Nepali Date (BS)</th>
+                  <th className="text-left px-4 py-3 text-slate-400 font-semibold">Date (AD)</th>
                   <th className="text-right px-4 py-3 text-slate-400 font-semibold">Per Tola</th>
                   <th className="text-right px-4 py-3 text-slate-400 font-semibold">Per 10g</th>
                   <th className="text-right px-4 py-3 text-slate-400 font-semibold rounded-r-lg">Per Ounce</th>
@@ -130,7 +137,10 @@ export default async function SilverPricePage() {
               <tbody className="divide-y divide-navy-700/50">
                 {historyPrices.map((p) => (
                   <tr key={p.id} className="hover:bg-navy-950/30 transition-colors">
-                    <td className="px-4 py-3 text-slate-300">
+                    <td className="px-4 py-3 text-slate-200 font-medium">
+                      {p.nepali_date || getNepaliDate(p.date)}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
                       {p.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
                     <td className="px-4 py-3 text-right text-white font-medium tabular-nums">

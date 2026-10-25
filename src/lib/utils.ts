@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { BS_MONTH_DAYS, BS_MONTH_NAMES_NP } from './bs-calendar'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,47 +38,49 @@ export function formatNumber(amount: number): string {
   }).format(amount)
 }
 
-// Nepali date conversion (approximate BS dates)
-const nepaliMonths = [
-  'बैशाख', 'जेठ', 'असार', 'श्रावण', 'भदौ', 'असोज',
-  'कार्तिक', 'मंसिर', 'पुष', 'माघ', 'फाल्गुण', 'चैत्र'
-]
-
+// Nepali (BS) date conversion using the official BS calendar data
+// in ./bs-calendar (anchor: 2000-01-01 BS = 1943-04-14 AD).
+// The previous hand-rolled approximation (day + 15 / month + 8)
+// produced wrong dates — e.g. it showed 2026-10-25 as
+// "Kartik 10" instead of the correct Kartik 8, 2083.
 const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९']
 
 export function toNepaliDigits(num: number | string): string {
   return String(num).replace(/[0-9]/g, (d) => nepaliDigits[parseInt(d)])
 }
 
+const BS_EPOCH_UTC = Date.UTC(1943, 3, 14) // 2000-01-01 BS
+
 export function getNepaliDate(targetDate?: Date | string): string {
-  // Approximate BS date calculation (simplified)
-  const date = targetDate ? new Date(targetDate) : new Date()
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const day = date.getDate()
-  
-  // Approximate BS year (AD + 56.7 years)
-  // More accurate offset: April 13/14 is usually the start of the Nepali year
-  let bsYear = year + 56
-  let bsMonth = month + 8 // Offset from Jan (approx mid-April is Baisakh)
-  let bsDay = day + 15
-  
-  if (bsMonth > 11) {
-    bsMonth -= 12
-    bsYear += 1
-  }
+  try {
+    const raw = targetDate ? new Date(targetDate) : new Date()
+    if (isNaN(raw.getTime())) return ''
+    // Work on the UTC calendar day so the result never shifts
+    // with the runtime timezone.
+    const dayUtc = Date.UTC(raw.getUTCFullYear(), raw.getUTCMonth(), raw.getUTCDate())
+    let days = Math.floor((dayUtc - BS_EPOCH_UTC) / 86400000)
+    if (days < 0) return ''
 
-  if (bsDay > 30) {
-    bsDay -= 30
-    bsMonth += 1
-  }
-  
-  if (bsMonth > 11) {
-    bsMonth -= 12
-    bsYear += 1
-  }
+    let year = 2000
+    while (BS_MONTH_DAYS[year]) {
+      const yearDays = BS_MONTH_DAYS[year].reduce((a, b) => a + b, 0)
+      if (days < yearDays) break
+      days -= yearDays
+      year++
+    }
+    const months = BS_MONTH_DAYS[year]
+    if (!months) return ''
 
-  return `${toNepaliDigits(bsYear)} ${nepaliMonths[bsMonth]} ${toNepaliDigits(bsDay)} गते`
+    let month = 0
+    while (month < 11 && days >= months[month]) {
+      days -= months[month]
+      month++
+    }
+
+    return `${toNepaliDigits(year)} ${BS_MONTH_NAMES_NP[month]} ${toNepaliDigits(days + 1)} गते`
+  } catch {
+    return ''
+  }
 }
 
 export function formatDateEN(date: Date | string): string {
