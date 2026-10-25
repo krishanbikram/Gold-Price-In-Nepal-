@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { revalidatePath } from 'next/cache'
 import { authOptions } from '@/lib/auth'
@@ -57,7 +57,7 @@ async function runUpdate() {
   return NextResponse.json({ success: true, updated: results })
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   return runUpdate()
 }
 
